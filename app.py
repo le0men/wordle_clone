@@ -30,7 +30,7 @@ def get_init():
 
 # check if a guess is valid
 @app.route("/check/", methods=["POST"])
-def guess():
+def check():
     body = json.loads(request.data)
     guess = body["guess"]
     works = wordle.check_works(guess)

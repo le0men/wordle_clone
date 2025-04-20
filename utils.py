@@ -9,7 +9,7 @@ valid_bank = pd.read_csv(os.path.join(base_dir, "data/valid_solutions.csv"))
 
 class Wordle:
     def __init__(self):
-        self.curr_word = valid_bank.sample().values[0][0]
+        self.curr_word = valid_bank.sample(random_state=1).values[0][0]
 
     def check_works(self, guess):
         guess = guess.lower()

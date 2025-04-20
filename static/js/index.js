@@ -5,7 +5,6 @@ var row = 0; // guess row (0-5 i.e. 6)
 var col = 0; //current letter of guess row (0-4 i.e 5)
 
 var gameOver = false;
-
 var word = "";
 
 window.onload = async () => {
@@ -88,5 +87,180 @@ const makeBoard = () => {
 
 }
 
+document.addEventListener('keyup', (e) => {
+    processInput(e);
+})
 
+function processKey() {
+    let e = { "code": this.id };
+    processInput(e);
+}
+
+async function processInput(e) {
+    if (gameOver) return;
+
+    // alert(e.code); debugging
+
+
+    if ("KeyA" <= e.code && e.code <= "KeyZ") {
+        if (col < width) {
+            let currTile = document.getElementById(row.toString() + "-" + col.toString());
+            if (currTile.innerText == "") {
+                currTile.innerText = e.code[3];
+                col += 1;
+
+            }
+        }
+    }
+
+    else if (e.code == "Backspace") {
+        if (0 < col && col <= width) {
+            col -= 1;
+        }
+        let currTile = document.getElementById(row.toString() + "-" + col.toString());
+        currTile.innerText = "";
+    }
+
+    else if (e.code == "Enter") {
+        if (col == width) {
+            let check = await checkWord();
+            if (check) {
+                document.getElementById("answer").innerText = "";
+                updateWord();
+            } else {
+                document.getElementById("answer").innerText = "Word not in the Word Bank.";
+            }
+        } else {
+            document.getElementById("answer").innerText = "Please enter 5 letters.";
+        }
+    }
+
+    if (!gameOver && row == height) {
+        gameOver = true;
+        document.getElementById("answer").innerText = word;
+    }
+}
+
+async function checkWord() {
+    let wordArray = [];
+    for (let c = 0; c < width; c++) {
+        let currTile = document.getElementById(row.toString() + "-" + c.toString());
+        let letter = currTile.innerText;
+        wordArray.push(letter);
+    }
+
+    let data = { guess: wordArray.join('') };
+
+    try {
+        let response = await fetch('/check/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+
+        let result = await response.json();
+        console.log(result);
+
+        let check = result['works'];
+
+        return check;
+
+    } catch (error) {
+        console.error("Error encountered: ", error);
+        return;
+    }
+
+}
+
+
+async function updateWord() {
+    // get status array from backend
+    let wordArray = [];
+    for (let c = 0; c < width; c++) {
+        let currTile = document.getElementById(row.toString() + "-" + c.toString());
+        let letter = currTile.innerText;
+        wordArray.push(letter);
+    }
+
+    let data = { guess: wordArray.join('') };
+    let array = null
+
+    try {
+        let response = await fetch('/guess/', {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+
+        let result = await response.json();
+        console.log(result);
+
+        array = result['status'];
+
+        return check;
+
+    } catch (error) {
+        console.error("Error encountered: ", error);
+    }
+
+    let correct = 0;
+
+    //check only correct ones
+    for (let c = 0; c < width; c++) {
+        let currTile = document.getElementById(row.toString() + "-" + c.toString());
+        let letter = currTile.innerText;
+
+        //stagger animation flip
+        setTimeout(() => {
+            // if letter is correct as given by the passed array
+            if (array[c] === 2) {
+                currTile.classList.add("correct", "animation-flip");
+
+                //Also light up the keyboard
+                let keyTile = document.getElementById("Key" + letter);
+                keyTile.classList.remove("present"); // in case it was present and we found it correct later.
+                keyTile.classList.add("correct");
+                correct += 1;
+            }
+
+            if (correct == width) {
+                gameOver = true;
+                document.getElementById("answer").innerText = "You guessed it right!";
+            }
+
+        }, c * 300) // 300ms delay
+
+    }
+
+    // loop again for present/absent
+    for (let c = 0; c < width; c++) {
+        let currTile = document.getElementById(row.toString() + "-" + c.toString());
+        let letter = currTile.innerText;
+
+        setTimeout(() => {
+            if (!currTile.classList.contains("correct")) { // so present css doesnt override an already marked tile
+
+                // if the letter is present but wrong position
+                if (array[c] === 1) {
+                    currTile.classList.add("present", "animation-flip");
+                    let keyTile = document.getElementById("Key" + letter);
+
+                    if (!keyTile.classList.contains("correct")) {
+                        keyTile.classList.add("present");
+                    }
+                }
+
+                else {
+                    currTile.classList.add("absent", "animation-flip");
+                    let keyTile = document.getElementById("Key" + letter);
+                    if (!keyTile.classList.contains("correct") && !keyTile.classList.contains("present")) {
+                        keyTile.classList.add("absent");
+                    }
+                }
+            }
+
+        }, c * 300)
+    }
+    // move row to next row and reset col
+    col = 0;
+    row += 1;
+}
 
