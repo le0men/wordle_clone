@@ -1,8 +1,10 @@
 from flask import Flask, request
+from flask_cors import CORS
 import json
 import utils
 
 app = Flask(__name__)
+CORS(app)
 
 
 def success_response(body, code=200):
@@ -14,6 +16,11 @@ def failure_response(message, code=404):
 
 
 wordle = utils.Wordle()
+
+
+@app.route("/api/state/", methods=["GET"])
+def get_init():
+    return success_response(wordle.return_board(), 200)
 
 
 @app.route("/api/guess/", methods=["POST"])

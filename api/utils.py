@@ -10,14 +10,14 @@ valid_bank = pd.read_csv(os.path.join(base_dir, "data/valid_solutions.csv"))
 class Wordle:
     def __init__(self):
         self.curr_move = 0
-        self.past_words = []
-        self.won = 0
+        self.won = "active"
 
-        # -1 for black/grey, 0 for yellow, 1 for green
-        self.board_coloring = [[-1 for _ in range(5)] for _ in range(6)]
+        self.board_coloring = [["absent" for _ in range(5)] for _ in range(6)]
+        self.board_guesses = [["" for _ in range(5)] for _ in range(6)]
         self.curr_word = valid_bank.sample().values[0][0]
 
     def guess(self, guess):
+        guess = guess.lower()
         if self.curr_move >= 6:
             return 400
         if (
@@ -26,31 +26,33 @@ class Wordle:
         ):
             return 404
 
-        self.past_words.append(guess)
-
         char_lst = list(self.curr_word)
         for i in range(5):
+            # correct selection
             if guess[i] == self.curr_word[i]:
-                self.board_coloring[self.curr_move][i] = 1
+                self.board_coloring[self.curr_move][i] = "correct"
                 char_lst.remove(self.curr_word[i])
+
+            # in char list
             elif guess[i] in char_lst:
-                self.board_coloring[self.curr_move][i] = 0
+                self.board_coloring[self.curr_move][i] = "present"
                 char_lst.remove(self.curr_word[i])
+
+            self.board_guesses[self.curr_move][i] = guess[i]
 
         self.curr_move += 1
         if guess == self.curr_word:
-            self.won = 1
+            self.won = "won"
+        if self.curr_move == 6:
+            self.won = "lost"
         return 200
 
     def return_board(self):
         return {
             "won": self.won,
-            "0": self.board_coloring[0],
-            "1": self.board_coloring[1],
-            "2": self.board_coloring[2],
-            "3": self.board_coloring[3],
-            "4": self.board_coloring[4],
-            "5": self.board_coloring[5],
+            "color": self.board_coloring,
+            "solution": self.curr_word,
+            "guesses": self.board_guesses,
         }
 
 
