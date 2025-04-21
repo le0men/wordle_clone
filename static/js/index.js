@@ -195,8 +195,6 @@ async function updateWord() {
 
         array = result['status'];
 
-        return check;
-
     } catch (error) {
         console.error("Error encountered: ", error);
     }
