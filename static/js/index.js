@@ -87,6 +87,12 @@ const makeBoard = () => {
 
 }
 
+function animatePop(tile) {
+    tile.classList.remove('animation-pop'); // reset if already animating
+    void tile.offsetWidth; // force reflow
+    tile.classList.add('animation-pop');
+}
+
 document.addEventListener('keyup', (e) => {
     processInput(e);
 })
@@ -106,6 +112,7 @@ async function processInput(e) {
         if (col < width) {
             let currTile = document.getElementById(row.toString() + "-" + col.toString());
             if (currTile.innerText == "") {
+                animatePop(currTile)
                 currTile.innerText = e.code[3];
                 col += 1;
 
