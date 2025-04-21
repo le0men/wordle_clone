@@ -7,6 +7,7 @@ var col = 0; //current letter of guess row (0-4 i.e 5)
 var gameOver = false;
 var word = "";
 
+// Map for displaying text if player wins
 var successText = {
     0: "Genius!",
     1: "Magnificent!",
@@ -21,6 +22,7 @@ window.onload = async () => {
     makeBoard();
 }
 
+// Receieve solution from backend
 const init = async () => {
     try {
         let response = await fetch('/state');
@@ -36,7 +38,7 @@ const init = async () => {
 
 }
 
-
+// Make board display
 const makeBoard = () => {
     for (let r = 0; r < height; r++) {
         for (let c = 0; c < width; c++) {
@@ -96,21 +98,25 @@ const makeBoard = () => {
 
 }
 
+// function for animating pop when adding a letter
 function animatePop(tile) {
     tile.classList.remove('animation-pop'); // reset if already animating
     void tile.offsetWidth; // force reflow
     tile.classList.add('animation-pop');
 }
 
+// Keyboard input is processed
 document.addEventListener('keyup', (e) => {
     processInput(e);
 })
 
+// Screen keyboard input is processed
 function processKey() {
     let e = { "code": this.id };
     processInput(e);
 }
 
+// Process data user inputs into board
 async function processInput(e) {
     if (gameOver) return;
 
@@ -137,6 +143,7 @@ async function processInput(e) {
         currTile.innerText = "";
     }
 
+    // logic for checking and updating board based off guess
     else if (e.code == "Enter") {
         if (col == width) {
             let check = await checkWord();
@@ -151,6 +158,7 @@ async function processInput(e) {
     }
 }
 
+// checks if an inputted word is a valid guess
 async function checkWord() {
     let wordArray = [];
     for (let c = 0; c < width; c++) {
@@ -181,9 +189,10 @@ async function checkWord() {
 
 }
 
-
+// Update the board with a valid guess
 async function updateWord() {
-    // get status array from backend
+
+    //compress char list into string
     let wordArray = [];
     for (let c = 0; c < width; c++) {
         let currTile = document.getElementById(row.toString() + "-" + c.toString());
@@ -194,6 +203,7 @@ async function updateWord() {
     let data = { guess: wordArray.join('') };
     let array = null
 
+    // get status array from backend
     try {
         let response = await fetch('/guess/', {
             method: 'POST',
@@ -211,7 +221,7 @@ async function updateWord() {
 
     let correct = 0;
 
-    //check only correct ones
+    //update letters according to status array
     for (let c = 0; c < width; c++) {
         let currTile = document.getElementById(row.toString() + "-" + c.toString());
         let letter = currTile.innerText;
@@ -230,46 +240,34 @@ async function updateWord() {
                 correct += 1;
             }
 
+            // present
+            else if (array[c] === 1) {
+                currTile.classList.remove('animation-pop');
+                currTile.classList.add("present", "animation-flip");
+                let keyTile = document.getElementById("Key" + letter);
+
+                if (!keyTile.classList.contains("correct")) {
+                    keyTile.classList.add("present");
+                }
+            }
+
+            //absent
+            else {
+                currTile.classList.remove('animation-pop');
+                currTile.classList.add("absent", "animation-flip");
+                let keyTile = document.getElementById("Key" + letter);
+                if (!keyTile.classList.contains("correct") && !keyTile.classList.contains("present")) {
+                    keyTile.classList.add("absent");
+                }
+            }
+
             if (correct == width) {
                 gameOver = true;
                 openPopup(successText[row])
             }
-
         }, c * 300) // 300ms delay
-
     }
 
-    // loop again for present/absent
-    for (let c = 0; c < width; c++) {
-        let currTile = document.getElementById(row.toString() + "-" + c.toString());
-        let letter = currTile.innerText;
-
-        setTimeout(() => {
-            if (!currTile.classList.contains("correct")) { // so present css doesnt override an already marked tile
-
-                // if the letter is present but wrong position
-                if (array[c] === 1) {
-                    currTile.classList.remove('animation-pop');
-                    currTile.classList.add("present", "animation-flip");
-                    let keyTile = document.getElementById("Key" + letter);
-
-                    if (!keyTile.classList.contains("correct")) {
-                        keyTile.classList.add("present");
-                    }
-                }
-
-                else {
-                    currTile.classList.remove('animation-pop');
-                    currTile.classList.add("absent", "animation-flip");
-                    let keyTile = document.getElementById("Key" + letter);
-                    if (!keyTile.classList.contains("correct") && !keyTile.classList.contains("present")) {
-                        keyTile.classList.add("absent");
-                    }
-                }
-            }
-
-        }, c * 300)
-    }
     // move row to next row and reset col
     col = 0;
     row += 1;
