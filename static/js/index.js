@@ -7,6 +7,15 @@ var col = 0; //current letter of guess row (0-4 i.e 5)
 var gameOver = false;
 var word = "";
 
+var successText = {
+    0: "Genius!",
+    1: "Magnificent!",
+    3: "Impressive!",
+    4: "Splendid",
+    5: "Great",
+    6: "Phew"
+}
+
 window.onload = async () => {
     await init();
     makeBoard();
@@ -132,13 +141,12 @@ async function processInput(e) {
         if (col == width) {
             let check = await checkWord();
             if (check) {
-                document.getElementById("answer").innerText = "";
                 updateWord();
             } else {
-                document.getElementById("answer").innerText = "Word not in the Word Bank.";
+                openPopup("Invalid Input: Word not Found");
             }
         } else {
-            document.getElementById("answer").innerText = "Please enter 5 letters.";
+            openPopup("Invalid Input: Enter 5 Letters");;
         }
     }
 }
@@ -224,7 +232,7 @@ async function updateWord() {
 
             if (correct == width) {
                 gameOver = true;
-                document.getElementById("answer").innerText = "You guessed it right!";
+                openPopup(successText[row])
             }
 
         }, c * 300) // 300ms delay
@@ -269,7 +277,29 @@ async function updateWord() {
     //check if game is lost
     if (!gameOver && row == height) {
         gameOver = true;
-        document.getElementById("answer").innerText = ("The word was: " + word.toUpperCase());
+        openPopup("The word was: " + word.toUpperCase());
     }
 }
+
+// Open the popup
+function openPopup(message) {
+    document.getElementById('popupContent').innerHTML = `<p>${message}</p>`;
+    document.getElementById('popupOverlay').classList.add('active');
+}
+
+// Close the popup
+function closePopup() {
+    document.getElementById('popupOverlay').classList.remove('active');
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function () {
+    const overlay = document.getElementById('popupOverlay');
+    const closeBtn = document.getElementById('popupClose');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+            overlay.classList.remove('active');
+        });
+    }
+});
 

@@ -162,3 +162,65 @@ hr {
     color: white;
     background-color: cornflowerblue;
 }
+
+/* Popup Overlay */
+.popup-overlay {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Popup Box */
+.popup-box {
+    background: #fff;
+    color: #2a2a2a;
+    border-radius: 10px;
+    padding: 32px 24px 24px 24px;
+    min-width: 300px;
+    max-width: 90vw;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    position: relative;
+    text-align: center;
+    animation: popup-in 0.3s;
+}
+
+/* Popup Open Animation */
+@keyframes popup-in {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Close Button */
+.popup-close {
+    position: absolute;
+    top: 5px;
+    right: 13px;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.popup-close:hover {
+    color: #e74c3c;
+}
+
+/* Show the popup (add this class with JS) */
+.popup-overlay.active {
+    display: flex;
+}
