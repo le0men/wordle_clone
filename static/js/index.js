@@ -134,11 +134,6 @@ async function processInput(e) {
             document.getElementById("answer").innerText = "Please enter 5 letters.";
         }
     }
-
-    if (!gameOver && row == height) {
-        gameOver = true;
-        document.getElementById("answer").innerText = word;
-    }
 }
 
 async function checkWord() {
@@ -260,5 +255,11 @@ async function updateWord() {
     // move row to next row and reset col
     col = 0;
     row += 1;
+
+    //check if game is lost
+    if (!gameOver && row == height) {
+        gameOver = true;
+        document.getElementById("answer").innerText = ("The word was: " + word.toUpperCase());
+    }
 }
 
