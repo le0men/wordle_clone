@@ -212,6 +212,7 @@ async function updateWord() {
         setTimeout(() => {
             // if letter is correct as given by the passed array
             if (array[c] === 2) {
+                currTile.classList.remove('animation-pop');
                 currTile.classList.add("correct", "animation-flip");
 
                 //Also light up the keyboard
@@ -240,6 +241,7 @@ async function updateWord() {
 
                 // if the letter is present but wrong position
                 if (array[c] === 1) {
+                    currTile.classList.remove('animation-pop');
                     currTile.classList.add("present", "animation-flip");
                     let keyTile = document.getElementById("Key" + letter);
 
@@ -249,6 +251,7 @@ async function updateWord() {
                 }
 
                 else {
+                    currTile.classList.remove('animation-pop');
                     currTile.classList.add("absent", "animation-flip");
                     let keyTile = document.getElementById("Key" + letter);
                     if (!keyTile.classList.contains("correct") && !keyTile.classList.contains("present")) {
