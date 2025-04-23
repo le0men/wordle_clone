@@ -247,7 +247,7 @@ hr {
     color: #e74c3c;
 }
 
-/* Show the popup (add this class with JS) */
+/* Show the popup */
 .popup-overlay.active {
     display: flex;
 }

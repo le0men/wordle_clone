@@ -31,12 +31,10 @@ const init = async () => {
         word = wordObject['solution'];
         console.log(word);
 
-
     } catch (error) {
         console.error(error);
         return;
     }
-
 }
 
 // Make board display
@@ -88,13 +86,10 @@ const makeBoard = () => {
                 keyTile.classList.add("key-button");
             }
             keyboardRow.appendChild(keyTile);
-
         }
 
         document.body.appendChild(keyboardRow);
-
     }
-
 }
 
 // function for animating pop when adding a letter
@@ -133,7 +128,6 @@ async function processInput(e) {
 
     // alert(e.code); debugging
 
-
     if ("KeyA" <= e.code && e.code <= "KeyZ") {
         if (col < width) {
             let currTile = document.getElementById(row.toString() + "-" + col.toString());
@@ -141,7 +135,6 @@ async function processInput(e) {
                 animatePop(currTile)
                 currTile.innerText = e.code[3];
                 col += 1;
-
             }
         }
     }
@@ -160,6 +153,7 @@ async function processInput(e) {
             let check = await checkWord();
             if (check) {
                 await updateWord();
+
                 // move row to next row and reset col
                 col = 0;
                 row += 1;
@@ -201,17 +195,12 @@ async function checkWord() {
         });
 
         let result = await response.json();
-        console.log(result);
-
-        let check = result['works'];
-
-        return check;
+        return result['works'];
 
     } catch (error) {
         console.error("Error encountered: ", error);
         return;
     }
-
 }
 
 // Update the board with a valid guess
@@ -236,12 +225,11 @@ async function updateWord() {
         });
 
         let result = await response.json();
-        console.log(result);
-
         array = result['status'];
 
     } catch (error) {
         console.error("Error encountered: ", error);
+        return;
     }
 
     let correct = 0;
@@ -292,8 +280,6 @@ async function updateWord() {
             }
         }, c * 300) // 300ms delay
     }
-
-
 }
 
 // Open the popup
