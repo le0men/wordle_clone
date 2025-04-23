@@ -235,7 +235,7 @@ async function updateWord() {
 
                 //Also light up the keyboard
                 let keyTile = document.getElementById("Key" + letter);
-                keyTile.classList.remove("present"); // in case it was present and we found it correct later.
+                keyTile.classList.remove("present", "absent"); // in case it was present and we found it correct later.
                 keyTile.classList.add("correct");
                 correct += 1;
             }
