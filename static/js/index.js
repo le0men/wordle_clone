@@ -1,11 +1,10 @@
 var height = 6; //number of guesses
 var width = 5; //length of word
 
-var row = 0; // guess row (0-5 i.e. 6)
-var col = 0; //current letter of guess row (0-4 i.e 5)
+var row = 0; // guess row (0-5)
+var col = 0; //current letter of guess row (0-4)
 
 var gameOver = false;
-var word = "";
 
 // Map for displaying text if player wins
 var successText = {
@@ -18,23 +17,8 @@ var successText = {
 }
 
 window.onload = async () => {
-    await init();
     makeBoard();
     openPopup("Welcome to Wordle! You get 6 chances to guess a 5-letter word.")
-}
-
-// Receieve solution from backend
-const init = async () => {
-    try {
-        let response = await fetch('/state');
-        let wordObject = await response.json();
-        word = wordObject['solution'];
-        console.log(word);
-
-    } catch (error) {
-        console.error(error);
-        return;
-    }
 }
 
 // Make board display
@@ -150,8 +134,10 @@ async function processInput(e) {
     // logic for checking and updating board based off guess
     else if (e.code == "Enter") {
         if (col == width) {
+            // check if word is a valid word
             let check = await checkWord();
             if (check) {
+                // update the board according to the word
                 await updateWord();
 
                 // move row to next row and reset col
@@ -161,6 +147,7 @@ async function processInput(e) {
                 //check if game is lost
                 if (!gameOver && row == height) {
                     gameOver = true;
+                    let word = await getSolution()
                     openPopup("The word was: " + word.toUpperCase());
                 }
 
@@ -279,6 +266,20 @@ async function updateWord() {
                 openPopup(successText[row])
             }
         }, c * 300) // 300ms delay
+    }
+}
+
+// Receieve solution from backend
+const getSolution = async () => {
+    try {
+        let response = await fetch('/state');
+        let wordObject = await response.json();
+        word = wordObject['solution'];
+        return word
+
+    } catch (error) {
+        console.error(error);
+        return;
     }
 }
 
