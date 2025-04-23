@@ -9,8 +9,8 @@ var word = "";
 
 // Map for displaying text if player wins
 var successText = {
-    0: "Genius!",
-    1: "Magnificent!",
+    1: "Genius!",
+    2: "Magnificent!",
     3: "Impressive!",
     4: "Splendid",
     5: "Great",
@@ -20,6 +20,7 @@ var successText = {
 window.onload = async () => {
     await init();
     makeBoard();
+    openPopup("Welcome to Wordle! You get 6 chances to guess a 5-letter word.")
 }
 
 // Receieve solution from backend
@@ -47,9 +48,7 @@ const makeBoard = () => {
             tile.classList.add("tile");
             tile.innerText = "";
             document.getElementById("board").appendChild(tile);
-
         }
-
     }
 
     // make the keyboard 
@@ -105,9 +104,21 @@ function animatePop(tile) {
     tile.classList.add('animation-pop');
 }
 
+function animateShake() {
+    for (let c = 0; c < width; c++) {
+        id = row.toString() + "-" + c.toString()
+        tile = document.getElementById(id)
+        tile.classList.remove('animation-flip', 'animation-pop');
+        tile.classList.remove('animation-shake'); // reset if already animating
+        void tile.offsetWidth; // force reflow
+        tile.classList.add('animation-shake');
+    }
+}
+
 // Keyboard input is processed
 document.addEventListener('keyup', (e) => {
-    processInput(e);
+    if (!document.getElementById('popupOverlay').classList.contains('active'))
+        processInput(e);
 })
 
 // Screen keyboard input is processed
@@ -148,12 +159,26 @@ async function processInput(e) {
         if (col == width) {
             let check = await checkWord();
             if (check) {
-                updateWord();
+                await updateWord();
+                // move row to next row and reset col
+                col = 0;
+                row += 1;
+
+                //check if game is lost
+                if (!gameOver && row == height) {
+                    gameOver = true;
+                    openPopup("The word was: " + word.toUpperCase());
+                }
+
             } else {
-                openPopup("Invalid Input: Word not Found");
+                animateShake()
+                openPopup("Not in word list");
+                setTimeout(closePopup, 1500)
             }
         } else {
-            openPopup("Invalid Input: Enter 5 Letters");;
+            animateShake()
+            openPopup("Not enough letters");
+            setTimeout(closePopup, 1500)
         }
     }
 }
@@ -268,15 +293,7 @@ async function updateWord() {
         }, c * 300) // 300ms delay
     }
 
-    // move row to next row and reset col
-    col = 0;
-    row += 1;
 
-    //check if game is lost
-    if (!gameOver && row == height) {
-        gameOver = true;
-        openPopup("The word was: " + word.toUpperCase());
-    }
 }
 
 // Open the popup
@@ -300,4 +317,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
 
