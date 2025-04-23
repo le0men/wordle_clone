@@ -1,26 +1,31 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block head %}
-<title>Wordle-Clone</title>
-<script src="{{url_for('static', filename='js/index.js')}}"></script>
-{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="icon" href="/static/icons/alpha-wordle-icon-new-smallSquare252-v3.webp">
+    <title>Wordle-Clone</title>
+    <script src="{{url_for('static', filename='js/index.js')}}"></script>
+</head>
 
-{% block body %}
-<main class="container">
-    <img src="static/icons/wordle-seeklogo.png" class="logo">
-    <hr>
-    <br>
-    <section id="board">
+<body>
+    <main class="container">
+        <img src="static/icons/wordle-seeklogo.png" class="logo">
+        <hr>
+        <br>
+        <section id="board">
 
-    </section>
-    <br>
-</main>
-<div class="popup-overlay" id="popupOverlay">
-    <div class="popup-box" id="popupBox">
-        <span class="popup-close" id="popupClose">&times;</span>
-        <div class="popup-content" id="popupContent">
-            <p></p>
+        </section>
+        <br>
+    </main>
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-box" id="popupBox">
+            <span class="popup-close" id="popupClose">&times;</span>
+            <div class="popup-content" id="popupContent">
+                <p></p>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+</body>
